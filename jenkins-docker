@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Deploy on container'){
             steps{
-\\                sh "docker container rm -f $(docker container ps -qa)"
+// \\                sh "docker container rm -f $(docker container ps -qa)"
                 sh "docker run -p 8181:8080 -d tomcatwebapp:${env.BUILD}"
             }
         }

@@ -1,0 +1,50 @@
+
+pipeline{
+	agent any 
+	
+	parameters{
+		string (name:  'tomcat_dev', defaultValue: '18.212.66.228', description: 'staging server ' )
+	
+	}
+	
+	triggers{
+		pollSCM('* * * * *')
+	
+	}
+	
+	stages{
+		stage('Build'){
+			steps{
+				echo 'running mvn...'
+				sh 'mvn clean package'
+			
+			}
+			post{
+				success {
+					echo 'now archiving ...'
+					archiveArtifacts artifacts: '**/*.war'
+				
+				}
+			
+			}
+		
+		}
+		
+		stage ('Deploy'){
+			parallel{
+				stage ('deploy to stage ') {
+					steps{
+						sh "scp -i /home/jenkins/ajayveldhidbaUS-EAST-1.pem **/target/*.war ec2-user@${params.tomcat_dev}:/opt/apache-tomcat-8.5.34/webapps"
+					}
+				
+				}
+			
+			}
+			
+		
+		
+		}
+	
+	}
+
+}
